@@ -4,7 +4,7 @@
 #include <std_msgs/Float64.h>
 float err,curr_ang; int count=0;
 std_msgs::Float64 ang_go;
-float tar_ang=60,fin_ang;
+float tar_ang=120,fin_ang;
 #include <sstream>
 
 void errCallback(const std_msgs::Float64::ConstPtr& float_msgs) 
@@ -30,21 +30,23 @@ int main(int argc, char **argv)
 	
 	while (ros::ok()) 
 	{	
-		float prev_ang;
-		if (count==0)
-		{fin_ang=curr_ang+10; count++;
-		}
+		// float prev_ang;
+		// if (count==0)
+		// {
+		// 	fin_ang=curr_ang+10; count++;
+		// }
 
-		if ((err<3) && ((tar_ang - fin_ang)>3))
-		{
-		fin_ang=curr_ang+10;
-		}
+		// if ((err<3) && ((tar_ang - fin_ang)>3))
+		// {
+		// 	fin_ang=curr_ang+10;
+		// }
 
-		if (tar_ang - curr_ang <2 && tar_ang< 230)
-		{tar_ang=tar_ang+80;
-			}
+		// if (tar_ang - curr_ang <2 && tar_ang< 230)
+		// {
+		// 	tar_ang=tar_ang+80;
+		// }
 		
-
+		fin_ang=tar_ang;
 		ang_go.data=fin_ang;
 		angl.publish(ang_go);
 		
