@@ -82,33 +82,15 @@ int main(int argc, char **argv)
 
 		torque = (kp*error) + (ki*integral) + (kd*derivative);
 		cout<<torque;
-		// if(torque>tmax)
-		// {
-		// trq=tmax;
-		// }
-		// else if(torque<tmin)
-		// {
-		// trq=tmin;
-		// }
-		// else
-		// {
-		// trq=torque;
-		// }
-
-		trq=torque;
-		//trq=500;
-		//tprs=torque;
-		//trq=(torque)+tau*(tprs-tprv);
-		//tprv=trq;
-		
-		twist.angular.x = st_13+(trq);
-		twist.angular.y = st_13-(trq);
-		errp.data=error;
-		angle.data=kp;
+			
+		twist.angular.x = str_ang;
+		twist.angular.y = str_ang;
+		// errp.data=error;
+		// angle.data=kp;
 		vel.publish(twist);
-		err.publish(errp);
+		// err.publish(errp);
 
-		ang.publish(angle);
+		// ang.publish(angle);
 		ros::spinOnce();
 		loop_rate.sleep();
 		++count;
