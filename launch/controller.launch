@@ -1,15 +1,14 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="can_kp" default="30" />
+  <arg name="can_kp" default="15" />
   <arg name="can_ki" default="0" />
-  <arg name="can_kd" default="0" />
-  <arg name="can_tau" default="0.5" />
+  <arg name="can_kd" default="0.1" />
+ 
 
   <node pkg="learning_joy" type="new" name="new">
     <param name="can_kp" value="$(arg can_kp)" />
     <param name="can_ki" value="$(arg can_ki)" />
     <param name="can_kd" value="$(arg can_kd)" />
-    <param name="can_tau" value="$(arg can_tau)" />
   </node>
 
  <node pkg="learning_joy" type="angle" name="angle">

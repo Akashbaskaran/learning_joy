@@ -4,7 +4,7 @@
 #include <std_msgs/Float64.h>
 float err,curr_ang; int count=0;
 std_msgs::Float64 ang_go;
-float tar_ang=120,fin_ang;
+float tar_ang=60,fin_ang;
 #include <sstream>
 
 void errCallback(const std_msgs::Float64::ConstPtr& float_msgs) 
