@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="can_kp" default="15" />
-  <arg name="can_ki" default="0" />
-  <arg name="can_kd" default="0.1" />
+  <arg name="can_kp" default="2" />
+  <arg name="can_ki" default="0.3" />
+  <arg name="can_kd" default="0" />
  
 
   <node pkg="learning_joy" type="new" name="new">

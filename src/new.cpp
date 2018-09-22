@@ -11,7 +11,7 @@ using std::cout;
 float bit1,bit2;
 float last_error=0,targetp;
 //30,40
-float kp=20,ki=0.0,kd=0.0,integral=0,tau=0,pid_d=0,pid_i=0,pid_p=0;
+float kp=0,ki=0.0,kd=0.0,integral=0,tau=0,pid_d=0,pid_i=0,pid_p=0;
 geometry_msgs::Twist twist;
 std_msgs::Float64 errp,angle;
 float tmax=200,tmin=-200,T_prv=0,T_prs,trq;
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
    ros::NodeHandle prive("~");
 
-	ros::Publisher vel = n.advertise<geometry_msgs::Twist>("joy_vel", 15);
+	ros::Publisher vel = n.advertise<geometry_msgs::Twist>("joy_vel", 1);
 	ros::Publisher err = n.advertise<std_msgs::Float64>("error", 500);
 	ros::Publisher tar = n.advertise<std_msgs::Float64>("target", 500);
 	ros::Publisher ang = n.advertise<std_msgs::Float64>("angle", 500);
@@ -57,8 +57,8 @@ int main(int argc, char **argv)
 	//reference from previous code
     //twist.angular.x = st_13 + k/(.002857*1.5);
 	//twist.angular.y = st_12 - k/(.002857*1.5);
-	tmax=500+targetp;
-	tmin=-500-targetp;
+	tmax=500+abs(targetp);
+	tmin=-500-abs(targetp);
 	
 	while (ros::ok()) 
 	{	auto start = std::chrono::high_resolution_clock::now();
@@ -72,26 +72,52 @@ int main(int argc, char **argv)
 		bit2val=bit2;
 		str_ang=-((bit2val*255+bit1))/10;
 		}
-		prive.getParam("can_kp", kp);
-		prive.getParam("can_ki", ki);
-		prive.getParam("can_kd", kd);
+
+		
 		float currentp,derivative,torque,error;
 		int st_13=3088; 
 		
 		currentp=str_ang;
 		error=(targetp - currentp);
+		
+		prive.getParam("can_kp", kp);
+		prive.getParam("can_ki", ki);
+		prive.getParam("can_kd", kd);
+		// New code with over shoot 
+		// if (abs(error) > 5)
+		// {
+		// pid_p=kp*error;
+		// pid_i=ki*error + pid_i;
+		// torque=pid_p +pid_i;
+		// }
+		// else
+		// {
+		// 	torque=0;
+		// 	pid_i=0;
+		// }
+
+
+		// Old Code
+		// pid_p=kp*error;
+		// if(abs(error)>5)
+		// {	
+	
+		// pid_i=pid_i + (ki*error);
+		// }
+		// else
+		// 	{ 
+		// 	pid_i=0;
+		// 	}
+
+
 		pid_p=kp*error;
 		
-		if(abs(error) < 5)
-		{
-			
-		pid_i=pid_i + (ki*error);
-		}
+		pid_i=ki*error + pid_i;
 		auto finish = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> elapsed = finish - start;
 		double dif=elapsed.count();
 
-		pid_d= ki*((error-last_error)/(dif*1000));
+		pid_d= kd*((error-last_error));
 
 		torque = pid_p + pid_i + pid_d;
 
@@ -111,11 +137,12 @@ int main(int argc, char **argv)
 		//tprs=torque;
 		//trq=(torque)+tau*(tprs-tprv);
 		//tprv=trq;
+		trq=torque;
 		
 		twist.angular.x = st_13+(trq);
 		twist.angular.y = st_13-(trq);
 		errp.data=error;
-		angle.data=dif;
+		angle.data=pid_d;
 		vel.publish(twist);
 		err.publish(errp);
 
