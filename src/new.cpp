@@ -44,6 +44,7 @@ int main(int argc, char **argv)
 	ros::Publisher vel = n.advertise<geometry_msgs::Twist>("joy_vel", 1);
 	ros::Publisher err = n.advertise<std_msgs::Float64>("error", 500);
 	ros::Publisher tar = n.advertise<std_msgs::Float64>("target", 500);
+	//ros::Publisher can_info = n.advertise<sensor_msgs::CameraInfo>("can_str", 500);
 	ros::Publisher ang = n.advertise<std_msgs::Float64>("angle", 500);
 	ros::Subscriber sub = n.subscribe("can_st_bit1", 500, strCallback);
 	ros::Subscriber sub2 = n.subscribe("can_st_bit2", 500, strCallback2);
@@ -141,7 +142,7 @@ int main(int argc, char **argv)
 		
 		twist.angular.x = st_13+(trq);
 		twist.angular.y = st_13-(trq);
-		errp.data=error;
+		errp.data=currentp;
 		angle.data=pid_d;
 		vel.publish(twist);
 		err.publish(errp);
