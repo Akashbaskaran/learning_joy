@@ -6,6 +6,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <chrono>
+#include <sensor_msgs/CameraInfo.h>
 
 using std::cout;
 float bit1,bit2;
@@ -13,8 +14,9 @@ float last_error=0,targetp;
 //30,40
 float kp=0,ki=0.0,kd=0.0,integral=0,tau=0,pid_d=0,pid_i=0,pid_p=0;
 geometry_msgs::Twist twist;
+sensor_msgs::CameraInfo str_inf;
 std_msgs::Float64 errp,angle;
-float tmax=200,tmin=-200,T_prv=0,T_prs,trq;
+float tmax=300,tmin=-300,T_prv=0,T_prs,trq;
 time_t start,end;
 
 #include <sstream>
@@ -44,7 +46,7 @@ int main(int argc, char **argv)
 	ros::Publisher vel = n.advertise<geometry_msgs::Twist>("joy_vel", 1);
 	ros::Publisher err = n.advertise<std_msgs::Float64>("error", 500);
 	ros::Publisher tar = n.advertise<std_msgs::Float64>("target", 500);
-	//ros::Publisher can_info = n.advertise<sensor_msgs::CameraInfo>("can_str", 500);
+	ros::Publisher can_info = n.advertise<sensor_msgs::CameraInfo>("can_str", 500);
 	ros::Publisher ang = n.advertise<std_msgs::Float64>("angle", 500);
 	ros::Subscriber sub = n.subscribe("can_st_bit1", 500, strCallback);
 	ros::Subscriber sub2 = n.subscribe("can_st_bit2", 500, strCallback2);
@@ -56,7 +58,7 @@ int main(int argc, char **argv)
 	float bit2val,str_ang;
 	
 	//reference from previous code
-    //twist.angular.x = st_13 + k/(.002857*1.5);
+   	//twist.angular.x = st_13 + k/(.002857*1.5);
 	//twist.angular.y = st_12 - k/(.002857*1.5);
 	tmax=500+abs(targetp);
 	tmin=-500-abs(targetp);
@@ -138,16 +140,39 @@ int main(int argc, char **argv)
 		//tprs=torque;
 		//trq=(torque)+tau*(tprs-tprv);
 		//tprv=trq;
+		
+
+
+		//Commenting out this line.Uncomment this line to resume previous functioning 
 		trq=torque;
 		
 		twist.angular.x = st_13+(trq);
 		twist.angular.y = st_13-(trq);
+
 		errp.data=currentp;
-		angle.data=pid_d;
+		//str_inf has steering angle in P with time stamp(str_inf.P[0]) which is published on /can_str 
+		//The value of the constants Kp, Ki, kd are published on str_inf.K[0],str_inf.K[1],str_inf.k[2] respectively
+		//The value of the contribution of pid_p, pid_i and pid_d are published on str_inf.K[3],str_inf.K[4],str_inf.K[5]
+		// The steering angle without the time stamps for checking can be found out by subscribing to the topic angle
+                str_inf.header.frame_id=std::string("camera");
+                str_inf.header.stamp = ros::Time::now();
+		str_inf.P[0]=currentp;
+		str_inf.K[0]=kp;
+		str_inf.K[1]=ki;
+		str_inf.K[2]=kd;
+		str_inf.K[3]=pid_p;
+		str_inf.K[4]=pid_i;
+		str_inf.K[5]=pid_d;
+
+		angle.data=currentp;
+
+
+		//publish data
 		vel.publish(twist);
 		err.publish(errp);
-
+		can_info.publish(str_inf);
 		ang.publish(angle);
+
 		ros::spinOnce();
 		loop_rate.sleep();
 		++count;
