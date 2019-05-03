@@ -162,9 +162,11 @@ include_directories(
 add_executable(new src/new.cpp)
 add_executable(angle src/angle.cpp)
 add_executable(turtle_teleop_joy src/turtle_teleop_joy.cpp)
+add_executable(test_bench src/test_bench.cpp)
 target_link_libraries(turtle_teleop_joy ${catkin_LIBRARIES})
 target_link_libraries(new ${catkin_LIBRARIES})
 target_link_libraries(angle ${catkin_LIBRARIES})
+target_link_libraries(test_bench ${catkin_LIBRARIES})
 
 
 ## Mark executable scripts (Python etc.) for installation

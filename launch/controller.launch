@@ -2,7 +2,7 @@
 <launch>
   <arg name="can_kp" default="2" />
   <arg name="can_ki" default="0.3" />
-  <arg name="can_kd" default="0" />
+  <arg name="can_kd" default="0.2" />
  
 
   <node pkg="learning_joy" type="new" name="new">
@@ -11,6 +11,7 @@
     <param name="can_kd" value="$(arg can_kd)" />
   </node>
 
+ 
  <node pkg="learning_joy" type="angle" name="angle">
 </node>
 </launch>

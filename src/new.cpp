@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 	ros::Publisher ang = n.advertise<std_msgs::Float64>("angle", 500);
 	ros::Subscriber sub = n.subscribe("can_st_bit1", 500, strCallback);
 	ros::Subscriber sub2 = n.subscribe("can_st_bit2", 500, strCallback2);
-	ros::Subscriber sub3 = n.subscribe("ang2go", 500, angCallback2);
+	ros::Subscriber sub3 = n.subscribe("ang2steer", 500, angCallback2);
 	ros::Rate loop_rate(10);
 	int count = 0;
 
@@ -145,9 +145,17 @@ int main(int argc, char **argv)
 
 		//Commenting out this line.Uncomment this line to resume previous functioning 
 		trq=torque;
-		
+		if(st_13+trq < 3888)
+		{
 		twist.angular.x = st_13+(trq);
 		twist.angular.y = st_13-(trq);
+		}
+		else
+		{
+			twist.angular.x=3888;
+			twist.angular.y=2288;
+		}
+
 
 		errp.data=currentp;
 		//str_inf has steering angle in P with time stamp(str_inf.P[0]) which is published on /can_str 
